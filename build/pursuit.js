@@ -13,12 +13,17 @@
     let radius = 10; // 小球半径
     let maxVelocity = 5; // 最大速度
     let mass = 20; // 小球质量
-    let maxForce = 100; // 最大推力
+    let maxForce = 50; // 最大推力
     //  红色小球初始位置(画布中间)
     let redTargetPosition = new Vector3D(30, canvas.height - 50);
     // 黑色小球初始位置
     let blackTargetPosition = new Vector3D(10, 50);
     let blackTargetVelocity = new Vector3D(1, 0);
+    // 蓝色色小球初始位置
+    let blueTargetPosition = new Vector3D(10, 550);
+    let blueTargetVelocity = new Vector3D(1, 0);
+    // 当前追捕的目标
+    let targetPosition = blackTargetPosition;
     let redTargetVelocity = new Vector3D(3, -1); // 红色小球初始速度
     let desiredVelocity = new Vector3D(); // 红色小球期望速度
     let steering = new Vector3D(); // 红色小球受到的推力
@@ -43,13 +48,19 @@
         return seek(futurePosition);
     };
     let render = () => {
-        // 红色小球和黑色小球的距离<2的时候，重新随机黑色小球的位置
-        if (Math.abs(redTargetPosition.x - blackTargetPosition.x) < 3 &&
-            Math.abs(redTargetPosition.y - blackTargetPosition.y) < 3) {
-            blackTargetPosition.y = blackTargetPosition.y === 550 ? 50 : 550;
+        // 红色小球和黑色/蓝色小球的距离<3的时候，改变目标
+        let dxBlack = Math.abs(redTargetPosition.x - blackTargetPosition.x);
+        let dyBlack = Math.abs(redTargetPosition.y - blackTargetPosition.y);
+        let dxBlue = Math.abs(redTargetPosition.x - blueTargetPosition.x);
+        let dyBlue = Math.abs(redTargetPosition.y - blueTargetPosition.y);
+        if (dxBlack < 3 && dyBlack < 3) {
+            targetPosition = blueTargetPosition;
+        }
+        if (dxBlue < 3 && dyBlue < 3) {
+            targetPosition = blackTargetPosition;
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        steering = pursuit(redTargetPosition, blackTargetPosition, blackTargetVelocity);
+        steering = pursuit(redTargetPosition, targetPosition, blackTargetVelocity);
         // 更新红色小球速度和位置 
         redTargetVelocity.add(steering);
         redTargetVelocity = truncate(redTargetVelocity, maxVelocity);
@@ -65,6 +76,19 @@
         ctx.fillStyle = 'black';
         ctx.beginPath();
         ctx.arc(blackTargetPosition.x, blackTargetPosition.y, radius, 0, 2 * Math.PI);
+        ctx.closePath();
+        ctx.fill();
+        // 绘制蓝色色小球
+        blueTargetPosition.add(blueTargetVelocity);
+        if (blueTargetPosition.x + radius >= canvas.width || blueTargetPosition.x - radius <= 0) {
+            blueTargetVelocity.x *= -1;
+        }
+        if (blueTargetPosition.y + radius >= canvas.height || blueTargetPosition.y - radius <= 0) {
+            blueTargetVelocity.y *= -1;
+        }
+        ctx.fillStyle = 'blue';
+        ctx.beginPath();
+        ctx.arc(blueTargetPosition.x, blueTargetPosition.y, radius, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.fill();
         // 绘制红色小球
