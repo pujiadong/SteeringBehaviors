@@ -28,6 +28,20 @@
     let desiredVelocity = new Vector3D();      // 红色小球期望速度
     let steering = new Vector3D();             // 红色小球受到的推力
 
+
+    let seek = (futurePosition: Vector3D) => {
+        // 计算期望速度
+        Vector3D.sub(futurePosition, redTargetPosition, desiredVelocity);
+        desiredVelocity.normalize();
+        desiredVelocity.scaleBy(maxVelocity);
+        // 计算转向力
+        Vector3D.sub(desiredVelocity, redTargetVelocity, steering);
+        steering = truncate(steering, maxForce);
+        steering.scaleBy(1 / mass);
+
+        return steering;
+    }
+
     let render = () => {
         
         // 红色小球和黑色小球的距离<2的时候，重新随机黑色小球的位置
@@ -40,18 +54,11 @@
         
         ctx.clearRect(0,0, canvas.width, canvas.height);
 
-        // 计算期望速度
-        Vector3D.sub(blackTargetPosition, redTargetPosition, desiredVelocity);
-        desiredVelocity.normalize();
-        desiredVelocity.scaleBy(maxVelocity);
-        // 计算转向力
-        Vector3D.sub(desiredVelocity, redTargetVelocity, steering);
-        steering = truncate(steering, maxForce);
-        steering.scaleBy(1 / mass);
+        steering = seek(blackTargetPosition);
 
         // 更新红色小球速度和位置
         redTargetVelocity.add(steering);
-        truncate(redTargetVelocity, maxVelocity);
+        redTargetVelocity = truncate(redTargetVelocity, maxVelocity);
         redTargetPosition.add(redTargetVelocity);
     
         // 绘制黑色小球

@@ -30,7 +30,10 @@
         displacement.scaleBy(CIRCLE_RADIUS);
         displacement.rotate(wanderAngle);
         wanderAngle += (Math.random() * ANGLE_CHANGE) - (ANGLE_CHANGE * 0.5);
+        // 计算转向力
         Vector3D.add(circleCenter, displacement, wanderForce);
+        wanderForce = truncate(wanderForce, maxForce);
+        wanderForce.scaleBy(1 / mass);
         return { wanderForce, circleCenter, displacement };
     }
     let render = () => {
@@ -58,8 +61,6 @@
         ctx.stroke();
         // 计算红色小球最新速度和最新位置
         let steering = info.wanderForce;
-        steering = truncate(steering, maxForce);
-        steering.scaleBy(1 / mass);
         velocity.add(steering);
         velocity = truncate(velocity, maxVelocity);
         position.add(velocity);

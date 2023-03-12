@@ -26,6 +26,23 @@
         redTargetPosition.y = evt.offsetY;
     });
 
+    let arrivel = (futurePosition: Vector3D) => {
+        // 计算期望速度
+        Vector3D.sub(futurePosition, redTargetPosition, desiredVelocity);
+        let distance = desiredVelocity.length;
+        if (distance < slowingRadius) {
+            // distance / slowingRadius 逐渐变小
+            desiredVelocity.normalize().scaleBy(maxVelocity).scaleBy(distance / slowingRadius);
+        } else {
+            desiredVelocity.normalize().scaleBy(maxVelocity);
+        }
+
+        // 转向力逐渐变大
+        Vector3D.sub(desiredVelocity, redTargetVelocity, steering);
+
+        return steering;
+    }
+
     let render = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // 绘制黑色小球
@@ -41,18 +58,7 @@
         ctx.closePath();
         ctx.stroke();
 
-        // 计算期望速度
-        Vector3D.sub(blackTargetPosition, redTargetPosition, desiredVelocity);
-        let distance = desiredVelocity.length;
-        if (distance < slowingRadius) {
-            // distance / slowingRadius 逐渐变小
-            desiredVelocity.normalize().scaleBy(maxVelocity).scaleBy(distance / slowingRadius);
-        } else {
-            desiredVelocity.normalize().scaleBy(maxVelocity);
-        }
-
-        // 转向力逐渐变大
-        Vector3D.sub(desiredVelocity, redTargetVelocity, steering);
+        steering = arrivel(blackTargetPosition);
         // 红色小球的速度逐渐变小，最终 redTargetVelocity = -steering
         redTargetVelocity.add(steering);
         redTargetVelocity = truncate(redTargetVelocity, maxVelocity);

@@ -24,6 +24,20 @@
     let desiredVelocity = new Vector3D();
     let steering = new Vector3D();
 
+    let flee = (futurePosition: Vector3D) => {
+        // 计算期望速度
+        Vector3D.sub(redTargetPosition, futurePosition, desiredVelocity);
+        desiredVelocity.normalize();
+        desiredVelocity.scaleBy(maxVelocity);
+
+        // 计算转向力
+        Vector3D.sub(desiredVelocity, redTargetVelocity, steering);
+        steering = truncate(steering, maxForce);
+        steering.scaleBy(1 / mass);
+
+        return steering;
+    }
+
     let render = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // 绘制黑色小球
@@ -48,15 +62,7 @@
 
         // 红色小球和黑色小球的距离<40的时候，调整红球的速度
         if ((redTargetPosition.x - blackTargetPosition.x) ** 2 + (redTargetPosition.y - blackTargetPosition.y) ** 2 < 100 ** 2) {
-            // 计算期望速度
-            Vector3D.sub(redTargetPosition, blackTargetPosition, desiredVelocity);
-            desiredVelocity.normalize();
-            desiredVelocity.scaleBy(maxVelocity);
-
-            // 计算转向力
-            Vector3D.sub(desiredVelocity, redTargetVelocity, steering);
-            steering = truncate(steering, maxForce);
-            steering.scaleBy(1 / mass);
+            steering = flee(blackTargetPosition);
         } else {
             steering.setValue(redTargetVelocity.x, redTargetVelocity.y);
             steering = truncate(steering, maxForce);

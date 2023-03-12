@@ -20,7 +20,7 @@ walkSync('build', function (filePath, stat) {
     <title>${filePath}</title>
 </head>
 <body>
-    <canvas id="canvas" width="400" height="400" style="border: 1px solid salmon"></canvas>
+    <canvas id="canvas" width="600" height="600" style="border: 1px solid salmon"></canvas>
     <script src="../build/utils.js"></script>
     <script src="../build/${filePath}"></script>
 </body>
