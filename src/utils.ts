@@ -20,6 +20,16 @@ class Vector3D {
         return result;
     }
 
+    public static scaleBy(vector: Vector3D, value: number, result?: Vector3D) {
+        if (!result) {
+            result = new Vector3D();
+        }
+        for (let i = 0; i < vector.element.length; i++) {
+            result.element[i] = vector.element[i] * value;
+        }
+        return result;
+    }
+
     private vector: number[];
 
     constructor(x?: number, y?: number, z?: number) {

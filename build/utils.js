@@ -18,6 +18,15 @@ class Vector3D {
         }
         return result;
     }
+    static scaleBy(vector, value, result) {
+        if (!result) {
+            result = new Vector3D();
+        }
+        for (let i = 0; i < vector.element.length; i++) {
+            result.element[i] = vector.element[i] * value;
+        }
+        return result;
+    }
     constructor(x, y, z) {
         this.vector = [x || 0, y || 0, z || 0];
     }
