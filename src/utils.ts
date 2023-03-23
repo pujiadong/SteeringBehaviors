@@ -36,6 +36,10 @@ class Vector3D {
         this.vector = [x || 0, y || 0, z || 0];
     }
 
+    public reset() {
+        this.setValue(0,0,0);
+    }
+
     public setValue(x: number, y: number, z?: number) {
         this.vector[0] = x;
         this.vector[1] = y;
